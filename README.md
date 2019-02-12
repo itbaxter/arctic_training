@@ -20,3 +20,5 @@ Using the command line
 - git status
 - git add
 - git commit
+
+Great job!
