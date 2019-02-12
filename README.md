@@ -4,3 +4,5 @@ Arctic Data Science Center Training Tutorial February 2019: Hands on materials f
 - Data
 - Lessons
 - Notes
+
+Made some changes from RStudio.
