@@ -24,3 +24,10 @@ Using the command line
 Great job!
 
 Thanks!
+
+Pushing at the same time.
+- the second person to push will get an error message
+- it will then tell you to pull first
+- then it will auto-merge and commit (you'll see a branch in the git window)
+- then the second person will push the most recent version
+    - everyone should pull before they start to edit and not edit same place at same time
