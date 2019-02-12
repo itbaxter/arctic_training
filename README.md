@@ -15,3 +15,8 @@ You can explicitly choose what goes into the commit.
 Format of commit descriptions:
 - What? (Concise)
 - Why? (Descriptive)
+
+Using the command line
+- git status
+- git add
+- git commit
