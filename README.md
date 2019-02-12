@@ -31,4 +31,5 @@ Pushing at the same time.
 - then it will auto-merge and commit (you'll see a branch in the git window)
 - then the second person will push the most recent version
     - everyone should pull before they start to edit and not edit same place at same time
+    - when a conflict arises someone (the owner?) should resolve the merge
 
