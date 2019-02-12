@@ -22,3 +22,5 @@ Using the command line
 - git commit
 
 Great job!
+
+Thanks!
