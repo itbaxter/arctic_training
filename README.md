@@ -6,3 +6,8 @@ Arctic Data Science Center Training Tutorial February 2019: Hands on materials f
 - Notes
 
 Made some changes from RStudio.
+- changes show up in Staging after I hit save.
+- but this doesn't save changes to the repository until I check Staged & Commit.
+
+You can explicitly choose what goes into the commit.
+- Unless it is a binary file, then it changes the whole thing.
