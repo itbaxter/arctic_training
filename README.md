@@ -33,3 +33,4 @@ Pushing at the same time.
     - everyone should pull before they start to edit and not edit same place at same time
     - when a conflict arises someone (the owner?) should resolve the merge
 
+Pull -> Edit -> Add -> Pull -> Commit -> Push
