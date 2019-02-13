@@ -39,3 +39,6 @@ Branching
 - git branch [branch_name] **to create branch
 - git checkout [branch_name] **to switch
 - git merge **to merge the branch
+
+Adding fork_in_road branch for testing
+- Gave a conflict to resolve
