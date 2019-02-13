@@ -34,3 +34,8 @@ Pushing at the same time.
     - when a conflict arises someone (the owner?) should resolve the merge
 
 Pull -> Edit -> Add -> Pull -> Commit -> Push
+
+Branching
+- git branch [branch_name] **to create branch
+- git checkout [branch_name] **to switch
+- git merge **to merge the branch
