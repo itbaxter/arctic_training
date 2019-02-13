@@ -42,3 +42,4 @@ Branching
 
 Adding fork_in_road branch for testing
 - Gave a conflict to resolve
+- You're merges if they are on the same place will be like the conflict w/ a collaborator
