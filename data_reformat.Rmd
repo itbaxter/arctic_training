@@ -146,7 +146,7 @@ dates_df <- data.frame(date = c("5/24/1930",
 ```
 
 Split seperates strings/characters at the first non-alpha numeric value.
-There is a package(Stringer) for first three letters/numbers.
+There is a package(stringr) for first three letters/numbers.
 ```{r}
 dates_split <- dates_df %>%
     # separate(date, into = c("month", "day", "year"), sep = "/")
@@ -163,3 +163,13 @@ dates_unite <- dates_split %>%
 head(dates_unite)
 ```
 
+```{r}
+library(stringr)
+
+str_pad("5", 2, side = "left", pad = "0")
+```
+
+Always put row.names=F otherwise it'll give you two columns of row names.
+```{r}
+write.csv(catch_clean, "catch_clean.csv", row.names = F)
+```
