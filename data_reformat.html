@@ -211,9 +211,16 @@ library(tidyr)
 <p>R will use the function with the same name from different packages from the package that was loaded most recently.</p>
 <p>Reading Data from a data archive.</p>
 <p><a href="https://knb.ecoinformatics.org/view/df35b.304.2">Mike Byerly. Alaska commercial salmon catches by management region (1886- 1997). Gulf of Alaska Data Portal. df35b.304.2.</a></p>
-<p>catch_original &lt;- read.csv(“<a href="https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1" class="uri">https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1</a>”, stringsAsFactors = FALSE) regdefs &lt;- read.csv(“<a href="https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1" class="uri">https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1</a>”, stringsAsFactors = FALSE) head(catch_original)</p>
-<pre class="r"><code>catch_original &lt;- read.csv(&quot;df35b.302.1.csv&quot;)
-regdefs &lt;- read.csv(&quot;df35b.303.1.csv&quot;)</code></pre>
+<pre class="r"><code>catch_original &lt;- read.csv(url(&quot;https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1&quot;, method =&quot;libcurl&quot;), stringsAsFactors = FALSE)
+regdefs &lt;- read.csv(url(&quot;https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1&quot;, method = &quot;libcurl&quot;), stringsAsFactors = FALSE)
+head(catch_original)</code></pre>
+<pre><code>##   Region Year Chinook Sockeye Coho Pink Chum All notesRegCode
+## 1    SSE 1886       0       5    0    0    0   5             
+## 2    SSE 1887       0     155    0    0    0 155             
+## 3    SSE 1888       0     224   16    0    0 240             
+## 4    SSE 1889       0     182   11   92    0 285             
+## 5    SSE 1890       0     251   42    0    0 292             
+## 6    SSE 1891       0     274   24    0    0 298</code></pre>
 <ol style="list-style-type: decimal">
 <li>Remove the <code>all</code> and <code>notesRegCode</code> columns using <code>seclect</code>
 <ul>
@@ -226,10 +233,9 @@ regdefs &lt;- read.csv(&quot;df35b.303.1.csv&quot;)</code></pre>
 </ol>
 <pre class="r"><code>catch_long &lt;- catch_original %&gt;%
     select(-All, -notesRegCode) %&gt;% # Add a -[variable_name] to remove
-    gather(key = &quot;species&quot;, value = &quot;catch&quot;, -Region, -Year) # creates key-value pairs and then gathers with other specified columns</code></pre>
-<pre><code>## Warning: attributes are not identical across measure variables;
-## they will be dropped</code></pre>
-<pre class="r"><code>head(catch_long)</code></pre>
+    gather(key = &quot;species&quot;, value = &quot;catch&quot;, -Region, -Year) # creates key-value pairs and then gathers with other specified columns
+
+head(catch_long)</code></pre>
 <pre><code>##   Region Year species catch
 ## 1    SSE 1886 Chinook     0
 ## 2    SSE 1887 Chinook     0
@@ -324,13 +330,67 @@ head(year_mean)</code></pre>
 <pre><code>## # A tibble: 6 x 6
 ## # Groups:   Year [1]
 ##   Region  Year species  catch catch_mean num_obs
-##   &lt;fct&gt;  &lt;int&gt; &lt;chr&gt;    &lt;dbl&gt;      &lt;dbl&gt;   &lt;int&gt;
+##   &lt;chr&gt;  &lt;int&gt; &lt;chr&gt;    &lt;dbl&gt;      &lt;dbl&gt;   &lt;int&gt;
 ## 1 SSE     1997 Chinook  38000    1635920      75
 ## 2 NSE     1997 Chinook 256000    1635920      75
 ## 3 YAK     1997 Chinook   7000    1635920      75
 ## 4 BER     1997 Chinook      0    1635920      75
 ## 5 COP     1997 Chinook  53000    1635920      75
 ## 6 PWS     1997 Chinook   1000    1635920      75</code></pre>
+<pre class="r"><code>region_defs &lt;- read.csv(url(&quot;https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1&quot;,
+                            method = &quot;libcurl&quot;),
+                        stringsAsFactors = FALSE) %&gt;% 
+    select(code, mgmtArea) # %&gt;%
+    # rename(Region)
+
+head(region_defs)</code></pre>
+<pre><code>##      code                                  mgmtArea
+## 1     GSE              Unallocated Southeast Alaska
+## 2     NSE                 Northern Southeast Alaska
+## 3     SSE                 Southern Southeast Alaska
+## 4     YAK                                   Yakutat
+## 5 PWSmgmt      Prince William Sound Management Area
+## 6     BER Bering River Subarea Copper River Subarea</code></pre>
+<p>If you do an inner join it would get rid of rows with N/A If you do an outer join it will have some rows with N/A</p>
+<pre class="r"><code>catch_joined &lt;- left_join(catch_clean, region_defs, by = c(&quot;Region&quot; = &quot;code&quot;))
+
+head(catch_joined)</code></pre>
+<pre><code>##   Region Year species catch                  mgmtArea
+## 1    SSE 1886 Chinook     0 Southern Southeast Alaska
+## 2    SSE 1887 Chinook     0 Southern Southeast Alaska
+## 3    SSE 1888 Chinook     0 Southern Southeast Alaska
+## 4    SSE 1889 Chinook     0 Southern Southeast Alaska
+## 5    SSE 1890 Chinook     0 Southern Southeast Alaska
+## 6    SSE 1891 Chinook     0 Southern Southeast Alaska</code></pre>
+<pre class="r"><code>dates_df &lt;- data.frame(date = c(&quot;5/24/1930&quot;,
+                                &quot;5/25/1930&quot;,
+                                &quot;5/26/1930&quot;,
+                                &quot;5/27/1930&quot;,
+                                &quot;5/28/1930&quot;),
+                       stringsAsFactors = FALSE)</code></pre>
+<p>Split seperates strings/characters at the first non-alpha numeric value. There is a package(Stringer) for first three letters/numbers.</p>
+<pre class="r"><code>dates_split &lt;- dates_df %&gt;%
+    # separate(date, into = c(&quot;month&quot;, &quot;day&quot;, &quot;year&quot;), sep = &quot;/&quot;)
+    separate(date, into = c(&quot;month&quot;, &quot;day&quot;, &quot;year&quot;), sep = &quot;/&quot;, remove = F)
+  
+head(dates_split)</code></pre>
+<pre><code>##        date month day year
+## 1 5/24/1930     5  24 1930
+## 2 5/25/1930     5  25 1930
+## 3 5/26/1930     5  26 1930
+## 4 5/27/1930     5  27 1930
+## 5 5/28/1930     5  28 1930</code></pre>
+<p>opposite of split() = unite()</p>
+<pre class="r"><code>dates_unite &lt;- dates_split %&gt;%
+    unite(col = date_iso, year, month, day, sep = &quot;-&quot;)
+
+head(dates_unite)</code></pre>
+<pre><code>##        date  date_iso
+## 1 5/24/1930 1930-5-24
+## 2 5/25/1930 1930-5-25
+## 3 5/26/1930 1930-5-26
+## 4 5/27/1930 1930-5-27
+## 5 5/28/1930 1930-5-28</code></pre>
 </div>
 </div>
 

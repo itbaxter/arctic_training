@@ -31,17 +31,11 @@ Reading Data from a data archive.
 
 [Mike Byerly. Alaska commercial salmon catches by management region (1886- 1997). Gulf of Alaska Data Portal. df35b.304.2.](https://knb.ecoinformatics.org/view/df35b.304.2)
 
-
-catch_original <- read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1", stringsAsFactors = FALSE)
-regdefs <- read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1", stringsAsFactors = FALSE)
-head(catch_original)
-
 ```{r}
-catch_original <- read.csv("df35b.302.1.csv")
-regdefs <- read.csv("df35b.303.1.csv")
+catch_original <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1", method ="libcurl"), stringsAsFactors = FALSE)
+regdefs <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1", method = "libcurl"), stringsAsFactors = FALSE)
+head(catch_original)
 ```
-
-
 
 1. Remove the `all` and `notesRegCode` columns using `seclect`
     - Pipe Operator (%>%)
@@ -122,3 +116,50 @@ year_mean <- catch_clean %>%
 
 head(year_mean)
 ```
+
+```{r}
+region_defs <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1",
+                            method = "libcurl"),
+                        stringsAsFactors = FALSE) %>% 
+    select(code, mgmtArea) # %>%
+    # rename(Region)
+
+head(region_defs)
+```
+
+If you do an inner join it would get rid of rows with N/A
+If you do an outer join it will have some rows with N/A
+```{r}
+catch_joined <- left_join(catch_clean, region_defs, by = c("Region" = "code"))
+
+head(catch_joined)
+```
+
+```{r}
+dates_df <- data.frame(date = c("5/24/1930",
+                                "5/25/1930",
+                                "5/26/1930",
+                                "5/27/1930",
+                                "5/28/1930"),
+                       stringsAsFactors = FALSE)
+
+```
+
+Split seperates strings/characters at the first non-alpha numeric value.
+There is a package(Stringer) for first three letters/numbers.
+```{r}
+dates_split <- dates_df %>%
+    # separate(date, into = c("month", "day", "year"), sep = "/")
+    separate(date, into = c("month", "day", "year"), sep = "/", remove = F)
+  
+head(dates_split)
+```
+
+opposite of split() = unite()
+```{r}
+dates_unite <- dates_split %>%
+    unite(col = date_iso, year, month, day, sep = "-")
+
+head(dates_unite)
+```
+
