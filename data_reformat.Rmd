@@ -7,9 +7,61 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Read the data out. We have two files.
+```{r, warning = FALSE, message = FALSE}
+library(dplyr)
+library(tidyr)
+
+# to call stats filter - stats::filter()
+```
+R will use the function with the same name from different packages from the package that was loaded most recently.
+
+Reading Data from a data archive.
+
+[Mike Byerly. Alaska commercial salmon catches by management region (1886- 1997). Gulf of Alaska Data Portal. df35b.304.2.](https://knb.ecoinformatics.org/view/df35b.304.2)
+
 ```{r}
-catch <- read.csv('df35b.302.1.csv')
-regdefs <- read.csv('df35b.303.1.csv')
+catch_original <- read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1", stringsAsFactors = FALSE)
+regdefs <- read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1", stringsAsFactors = FALSE)
+head(catch_original)
 ```
 
+1. Remove the 'all' and 'notesRegCode' columns using 'seclect'
+    - Pipe Operator (%>%)
+
+Cmd + shift : pipe operator shortcut %>%
+
+2. Move from wide to long format
+
+```{r}
+catch_long <- catch_original %>%
+    select(-All, -notesRegCode) %>% # Add a -[variable_name] to remove
+    gather(key = "species", value = "catch", -Region, -Year) # creates key-value pairs and then gathers with other specified columns
+
+head(catch_long)
+```
+
+```{r}
+catch_wide <- catch_long %>%
+    spread(key = species, value = catch)
+
+head(catch_wide)
+```
+```{r}
+catch_Wide <- catch_long %>%
+    spread(key = "Region", value = "catch")
+
+head(catch_Wide)
+```
+
+
+# Reformat Catch Data
+
+- Remove the "all" column (Just pretend it's a sum)
+- create a species column & table 
+    - move from wide to long
+- General QA
+
+# Join the Region Definitions
+
+
+# Misc. Functions
