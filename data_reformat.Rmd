@@ -1,0 +1,15 @@
+---
+title: "cleaning_practice1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Read the data out. We have two files.
+```{r}
+catch <- read.csv('df35b.302.1.csv')
+regdefs <- read.csv('df35b.303.1.csv')
+```
+
