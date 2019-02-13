@@ -1,0 +1,28 @@
+---
+title: "test"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+use_python("/Users/itbaxter/Anaconda2/python")
+```
+
+, engine.path="/Users/itbaxter/Anaconda2/python"
+
+```{python, engine.path="/Users/itbaxter/Anaconda2/"}
+import pandas as pd
+bg_chem_py = pd.read_csv("BGchem2008data.csv")
+print(bg_chem_py)
+```
+
+
+```{r, echo=FALSE}
+names(knitr::knit_engines$get())
+```
+
+```{python, engine.path="/Users/itbaxter/Anaconda2/"}
+import numpy as np
+```
+
