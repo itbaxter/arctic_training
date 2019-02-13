@@ -25,7 +25,7 @@ regdefs <- read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.30
 head(catch_original)
 ```
 
-1. Remove the 'all' and 'notesRegCode' columns using 'seclect'
+1. Remove the `all` and `notesRegCode` columns using `seclect`
     - Pipe Operator (%>%)
 
 Cmd + shift : pipe operator shortcut %>%
@@ -51,6 +51,30 @@ catch_Wide <- catch_long %>%
     spread(key = "Region", value = "catch")
 
 head(catch_Wide)
+```
+
+# Clean up our data
+
+* rename catch to catch_thousands
+* create a new catch column in units num. of fish `#`
+* create a new catch column in units num. of fish
+
+```{r}
+catch_clean <- catch_long %>%
+    rename(catch_thousands = catch) %>%
+    mutate(catch_thousands = ifelse(catch_thousands == "I", 1, catch_thousands)) %>%
+    mutate(catch_thousands = as.numeric(catch_thousands)) %>%
+    mutate(catch = catch_thousands * 1000) %>%
+    select(-catch_thousands)
+
+head(catch_clean)
+```
+
+Check to see where the value is messing everything up.
+```{r}
+test <- as.numeric(catch_long$catch)
+i <- which(is.na(test) == TRUE)
+catch_long[i,] 
 ```
 
 
