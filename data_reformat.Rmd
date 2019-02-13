@@ -7,6 +7,18 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Reformat Catch Data
+
+- Remove the "all" column (Just pretend it's a sum)
+- create a species column & table 
+    - move from wide to long
+- General QA
+
+# Join the Region Definitions
+
+
+# Misc. Functions
+
 ```{r, warning = FALSE, message = FALSE}
 library(dplyr)
 library(tidyr)
@@ -19,11 +31,17 @@ Reading Data from a data archive.
 
 [Mike Byerly. Alaska commercial salmon catches by management region (1886- 1997). Gulf of Alaska Data Portal. df35b.304.2.](https://knb.ecoinformatics.org/view/df35b.304.2)
 
-```{r}
+
 catch_original <- read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1", stringsAsFactors = FALSE)
 regdefs <- read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1", stringsAsFactors = FALSE)
 head(catch_original)
+
+```{r}
+catch_original <- read.csv("df35b.302.1.csv")
+regdefs <- read.csv("df35b.303.1.csv")
 ```
+
+
 
 1. Remove the `all` and `notesRegCode` columns using `seclect`
     - Pipe Operator (%>%)
@@ -71,21 +89,36 @@ head(catch_clean)
 ```
 
 Check to see where the value is messing everything up.
-```{r}
+```{r, echo = FALSE, eval = FALSE}
+# look for where as.numeric failed
 test <- as.numeric(catch_long$catch)
 i <- which(is.na(test) == TRUE)
 catch_long[i,] 
 ```
 
+## Split - Apply - Combine
 
-# Reformat Catch Data
+* calculate the mean catch by species
 
-- Remove the "all" column (Just pretend it's a sum)
-- create a species column & table 
-    - move from wide to long
-- General QA
+```{r}
+year_mean <- catch_clean %>%
+    group_by(Year) %>%
+    summarize(catch_mean = mean(catch),
+              num_obs = n()) %>%
+    arrange(-Year) %>%
+    filter(Year >= 1989 | Year <= 1960) # &=and, |=or
 
-# Join the Region Definitions
+head(year_mean)
+```
 
+Do not usually use grou_by and mutate together
+```{r}
+year_mean <- catch_clean %>%
+    group_by(Year) %>%
+    mutate(catch_mean = mean(catch),
+              num_obs = n()) %>%
+    arrange(-Year) %>%
+    filter(Year >= 1989 | Year <= 1960) # &=and, |=or
 
-# Misc. Functions
+head(year_mean)
+```
