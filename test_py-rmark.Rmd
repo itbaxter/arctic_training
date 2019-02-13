@@ -24,5 +24,6 @@ names(knitr::knit_engines$get())
 
 ```{python, engine.path="/Users/itbaxter/Anaconda2/"}
 import numpy as np
+mean_bg_chem = bg_chem.mean(dim=1)
 ```
 
