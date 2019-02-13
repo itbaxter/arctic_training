@@ -173,3 +173,6 @@ Always put row.names=F otherwise it'll give you two columns of row names.
 ```{r}
 write.csv(catch_clean, "catch_clean.csv", row.names = F)
 ```
+
+`read_xl` allos you to read an excel file and pick the tab.
+

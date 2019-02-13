@@ -1,0 +1,81 @@
+---
+title: "package_tutorial"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This section is based on making your code reproducible. 
+**D**on't
+**R**epeat
+**Y**ourself
+
+# Work with some data in degrees F
+
+- Convert to C
+
+```{r}
+airtemps <- c(212, 32, 64, 0, -20)
+
+airtemp1 <- (airtemps[1]-32)*5/9
+airtemp2 <- (airtemps[2]-32)*5/9
+airtemp3 <- (airtemps[3]-32)*5/9
+airtemp4 <- (airtemps[4]-32)*5/9
+airtemp5 <- (airtemps[5]-32)*5/9
+airtemp6 <- (airtemps[6]-32)*5/9
+
+airtemp_F <- (airtemps - 32) * 5/9
+```
+
+# Write a function to do that
+
+```{r}
+fahr_to_celsius <- function(fahr) {
+    celsius <- (fahr - 32) * 5/9
+    return(celsius)
+}
+
+celsius_temps <- fahr_to_celsius(airtemps)
+fahr_to_celsius()
+head(celsius_temps)
+```
+If you don't specify the `return()` it will return the last value in the function.
+You can specify the default input of the function 'fahr=100`.
+
+
+# Write a function to convert it the other way
+```{r}
+celsius_to_fahr <- function(celsius) {
+    fahr <- (celsius * 9/5) + 32
+    return(fahr)
+} 
+
+fahr_temps <- celsius_to_fahr(celsius_temps)
+fahr_temps == airtemps
+```
+Sometimes there are rounding errors associated with different versions of R. So watch out for that when testing.
+Testing
+1. Create an array.
+2. Put into the function.
+    - Check that each value is what is expected
+    - Does it work without a value
+3. Encode this as a test to make sure your function doesn't change.
+
+
+# Show how to document functions
+
+Define the function before you call it.
+Same as importing library.
+
+```{r}
+#' Converts numeric temperature data from degrees Fahrenheit to degrees Celsius
+#' 
+#'@param fahr the value in degrees Fahrenheit to be converted
+#'@return celsius the converted value in degrees Celsius
+celsius_to_fahr <- function(celsius) {
+    fahr <- (celsius * 9/5) + 32
+    return(fahr)
+} 
+```
