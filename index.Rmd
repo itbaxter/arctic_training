@@ -22,7 +22,7 @@ Docs/
     
 ## Other files from this workshop
 - [data reformatting practice](data_reformat.html)
-
+- [Python wit RMarkdown](test_py-rmark.html)
 -------------
 ## Tutorial Start
 
