@@ -23,6 +23,7 @@ Docs/
 ## Other files from this workshop
 - [data reformatting practice](data_reformat.html)
 - [Python with RMarkdown](test_py-rmark.html)
+- [Making functions in R](function_tutorial.html)
 
 -------------
 ## Tutorial Start
@@ -31,12 +32,12 @@ Load data directly from repository:
 
 Alaska Department of Fish and Game, Division of Commercial Fisheries. 2017. Daily salmon escapement counts from the OceanAK database, Alaska, 1921-2017. Knowledge Network for Biocomplexity. doi:10.5063/F1S46Q6M.
 
-```{r, warning = F, message=FALSE}
+```{r, warning = F, message=FALSE, echo = F}
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(scales)
 ```
-
 
 
 ```{r}
@@ -120,11 +121,30 @@ my_theme <- theme_test() +
 ggplot(filter(annual_esc, SASAP.Region == "Kodiak"), aes(x = Year, y = count/10^6, color = Species)) +
     geom_line() +
     geom_point() + 
+    # scale_y_continuous(labels = comma) +
     ylab("Escapement ( num of fish in millions)") +
     xlab("Year") +
     ggtitle("Kodiak Salmon Escapement") +
     my_theme
 ``` 
+
+fig.width and fig.height are in inches
+
+```{r, fig.width=10, fig.height=8}
+p <- ggplot(annual_esc, aes(x = Year, y = count, color = Species)) +
+    geom_line() +
+    geom_point() +
+    scale_y_continuous(label = comma) + 
+    facet_wrap(~SASAP.Region, scales = "free_y", ncol = 2) + 
+    my_theme
+p
+
+ggsave("figures/regional_escapement.png",
+    plot = p,
+    width = 10,
+    height = 8,
+    units = "in")
+```
 
 
 # Generate an interactive map
