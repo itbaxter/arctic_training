@@ -1,5 +1,5 @@
 ---
-title: "index"
+title: "Data Visualization"
 output: html_document
 ---
 
@@ -26,8 +26,65 @@ Docs/
 -------------
 ## Tutorial Start
 
-Load data directly from repository
+Load data directly from repository:
+
+Alaska Department of Fish and Game, Division of Commercial Fisheries. 2017. Daily salmon escapement counts from the OceanAK database, Alaska, 1921-2017. Knowledge Network for Biocomplexity. doi:10.5063/F1S46Q6M.
+
+```{r, warning = F, message=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+
+
 ```{r}
 esc <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/urn%3Auuid%3Af119a05b-bbe7-4aea-93c6-85434dcb1c5e", method = "libcurl"), stringsAsFactors = FALSE)
 ```
 
+## **What we're going to be doing today**
+
+* calculate annual escapement by species and region
+    * split, combine need to create a Year variable
+      * `seperate`
+      * `group_by`
+      * `summarize`
+    * group_by, summarize, sum
+    * filter
+      * `filter`
+* filter for just pacific salmon (Sockeye, Chinook, Coho, Pink, Chum)
+
+annual_esc
+
+```{r}
+annual_esc <- esc %>%
+    separate(sampleDate, into = c("Year", "Month", "Day"), sep = "-") %>%
+    group_by(Year, SASAP.Region, Species) %>%
+    summarize(count = sum(DailyCount)) %>%
+    # filter(Species != "Salmon")
+    filter(Species %in% c("Sockeye", "Chinook", "Coho", "Pink", "Chum"))
+  
+head(annual_esc)
+```
+
+
+# Generate some static plots
+
+Things you have to give to ggplot:
+
+    + data frame
+    + mapping (aes, aka "aesthetics")
+    + environment (give the parent frame)
+    
+Doesn't draw the geometry of the plot until you give it a geometry function
+
+    + It will only do the mapping until then
+    + Change the colors in the geom function
+    
+```{r}
+ggplot(annual_esc, mapping = aes(x = Species, y = count)) +
+    geom_col(fill = "blue")
+```
+
+
+# Generate an interactive map
