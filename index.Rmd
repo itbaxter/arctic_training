@@ -56,16 +56,29 @@ esc <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/urn%3Auu
 
 annual_esc
 
+#```{r}
+annual_esc <- esc %>%
+    separate(sampleDate, into = c("Year", "Month", "Day"), sep = "-") %>%
+    mutate(Year = as.numeric(Year)) %>% 
+    group_by(Year, SASAP.Region, Species) %>%
+    summarize(count = sum(DailyCount)) %>%
+    # filter(Species != "Salmon")
+    filter(Species %in% c("Sockeye", "Chinook", "Coho", "Pink", "Chum")) %>%
+  
+head(annual_esc)
+#```
+
 ```{r}
 annual_esc <- esc %>%
     separate(sampleDate, into = c("Year", "Month", "Day"), sep = "-") %>%
     group_by(Year, SASAP.Region, Species) %>%
     summarize(count = sum(DailyCount)) %>%
     # filter(Species != "Salmon")
-    filter(Species %in% c("Sockeye", "Chinook", "Coho", "Pink", "Chum"))
-  
-head(annual_esc)
+    filter(Species %in% c("Sockeye", "Chinook", "Coho", "Pink", "Chum")) %>%
+    ungroup() %>%
+    mutate(Year = as.numeric(Year)) # coerce Year to numeric type
 ```
+
 
 
 # Generate some static plots
@@ -80,11 +93,37 @@ Doesn't draw the geometry of the plot until you give it a geometry function
 
     + It will only do the mapping until then
     + Change the colors in the geom function
+    + Each geom works as a layer -> you can overlay geometries on top
+    + [RColorBrewer](http://colorbrewer2.org/)
     
 ```{r}
-ggplot(annual_esc, mapping = aes(x = Species, y = count)) +
-    geom_col(fill = "blue")
+ggplot(annual_esc, mapping = aes(x = Species, y = count, fill = SASAP.Region)) +
+    geom_col()
+    
+ggplot(annual_esc, mapping = aes(x = Species, y = count, fill = SASAP.Region)) +
+    scale_fill_brewer(palette = "Dark2") +
+    geom_col()
 ```
+
+Second option in `ggplot` will always be `aes()`
+    + One of the ways you'll primarily change the aesthetics will be with the theme settings
+    + ex: theme_bw or just type in theme_ and you get a list
+    
+```{r}
+my_theme <- theme_test() +
+    theme(legend.position = "right", legend.title = element_blank())
+```
+
+
+```{r}
+ggplot(filter(annual_esc, SASAP.Region == "Kodiak"), aes(x = Year, y = count/10^6, color = Species)) +
+    geom_line() +
+    geom_point() + 
+    ylab("Escapement ( num of fish in millions)") +
+    xlab("Year") +
+    ggtitle("Kodiak Salmon Escapement") +
+    my_theme
+``` 
 
 
 # Generate an interactive map
