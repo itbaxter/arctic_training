@@ -11,8 +11,12 @@ It's good to have an index page for your website.
 The index.html needs to have a lower case `i` or the first letter needs to be lower case.
 
 General directory structure:
+
 Docs/
+
     - index.html
+    
     - all other hmtl files
+    
     - to find the other html pages type in [userame].github.io/[project_name]/[file_name].html
     
