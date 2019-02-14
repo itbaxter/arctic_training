@@ -21,4 +21,13 @@ Docs/
     - to find the other html pages type in [userame].github.io/[project_name]/[file_name].html
     
 ## Other files from this workshop
-- [data reformatting practice](itbaxter.github.io/arctic_training/data_reformat.html)
+- [data reformatting practice](data_reformat.html)
+
+-------------
+## Tutorial Start
+
+Load data directly from repository
+```{r}
+esc <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/urn%3Auuid%3Af119a05b-bbe7-4aea-93c6-85434dcb1c5e", method = "libcurl"), stringsAsFactors = FALSE)
+```
+
