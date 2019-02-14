@@ -20,3 +20,5 @@ Docs/
     
     - to find the other html pages type in [userame].github.io/[project_name]/[file_name].html
     
+## Other files from this workshop
+- [data reformatting practice](itbaxter.github.io/arctic_training/data_reformat.html)
