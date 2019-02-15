@@ -1,0 +1,171 @@
+---
+title: "Geospatial Analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, warning=FALSE,message=FALSE}
+library(sf)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(leaflet)
+library(scales)
+```
+
+vectors = polygons, points, lines
+
+raster = grids
+
+```{r}
+ak_shp_sf <- read_sf("shapefiles/ak_regions_simp.shp")
+```
+
+* `read_sf` and `st_read` are almost identical 
+* you can work with spatial objects like they are dataframes using sf
+* gives you a sticky geometry column
+
+```{r}
+plot(ak_shp_sf)
+```
+
+To check the projection
+```{r}
+st_crs(ak_shp_sf)
+```
+
+
+Same as in cartopy...
+```{r}
+ak_shp_sf <- ak_shp_sf %>%
+    st_transform(crs = 3338) # 3338: Alaska Albers Equidistant Area
+
+st_crs(ak_shp_sf)
+
+plot(ak_shp_sf)
+```
+
+## Spatial Joins
+
+Bring in population data and plot across regions
+
+```{r}
+pop <- read.csv("shapefiles/alaska_population.csv")
+```
+
+If you want to do proper geospatial analysis you should do this:
+* Remove in this will get rid of the lat/lon columns
+```{r}
+pop_sf <- st_as_sf(pop,
+                   coords = c("lng", "lat"),
+                   crs = 4326,
+                   remove = F) %>%
+    st_transform(crs = 3338)
+```
+
+```{r}
+pop_joined_sf <- st_join(pop_sf, ak_shp_sf, join = st_within)
+
+plot(pop_joined_sf["region"]) # default will plot every column
+```
+
+## Group by and summarise
+
+Operate as if using a dataframe(we're tossing out the geometry/grouped point columns)
+
+?group_by.sf
+```{r}
+pop_region <- pop_joined_sf %>%
+    as.data.frame() %>%
+    group_by(region) %>%
+    summarise(total_pop = sum(population))
+
+head(pop_region)
+```
+
+```{r}
+ak_pop_sf <- left_join(ak_shp_sf, pop_region)
+
+plot(ak_pop_sf["total_pop"])
+```
+
+You can group and summarise across geometries
+
+```{r}
+ak_mgmt <- ak_pop_sf %>%
+    group_by(mgmt_area) %>%
+    summarise(total_pop = sum(total_pop), do_union = FALSE) # do_union = to join the geometries
+
+plot(ak_mgmt["total_pop"])
+```
+
+## How to write shapefiles
+
+```{r}
+write_sf(ak_shp_sf, "shapefiles/ak_regions_population.shp")
+```
+
+## Static Plots
+
+Put aes in the geom function so that it's easier to understand the layering
+    * You have to include the `data =` in geom function
+```{r}
+ggplot() + 
+    geom_sf(data = ak_pop_sf, aes(fill = total_pop)) + 
+    geom_sf(data = pop_sf, size = 0.5) +
+    theme_bw() +
+    labs(fill = "Total Population") +
+    scale_fill_continuous(low = "khaki", high = "firebrick", labels = comma)
+```
+
+
+## Interactive maps with Leaflet
+
+Leaflet wants to project for you
+    * Unproject your data
+    * Then you have to give it a projection on the fly
+```{r}
+epsg3338 <- leaflet::leafletCRS(
+    crsClass = "L.Proj.CRS",
+    code = "EPSG:3338",
+    proj4def =  "+proj=aea +lat_1=55 +lat_2=65 +lat_0=50 +lon_0=-154 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
+    resolutions = 2^(16:7))
+```
+
+1. Create your projection with leafletCRS()
+2. Transform your data to the right projection
+3. Create your color palette
+4. Plot with Leaflet
+
+```{r}
+ak_crs <- st_transform(ak_pop_sf, crs = 4326)
+pop_crs <- st_transform(pop_sf, crs = 4326)
+```
+
+
+```{r}
+pal <- colorNumeric(palette = "Reds", domain = ak_crs$total_pop)
+
+m <- leaflet(options = leafletOptions(crs = epsg3338)) %>%
+    addPolygons(data = ak_crs,
+                fillColor = ~pal(total_pop),
+                weight = 1,
+                color = "black",
+                label = ~region,
+                fillOpacity = 1) %>%
+    addCircleMarkers(data = pop_crs,
+                     lat = ~lat,
+                     lng = ~lng,
+                     radius = 2,
+                     fillColor = "gray",
+                     fillOpacity = 1,
+                     weight = .25,
+                     color = "black",
+                     label = ~city)
+
+m
+```
+
